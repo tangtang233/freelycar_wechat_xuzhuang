@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+		"-//Hibernate/Hibernate Configuration DTD 3.0//EN"
+		"http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+	<session-factory>
+
+		<property name="hibernate.show_sql">false</property>
+		<property name="hibernate.format_sql">true</property>
+		<property name="hibernate.hbm2ddl.auto">update</property>
+		<property name="hibernate.dialect">org.hibernate.dialect.MySQL5Dialect</property>
+		<!-- update -->
+
+		<!-- -->
+		<property name="hibernate.jdbc.batch_size">40</property>
+		
+		<property name="hibernate.cache.use_query_cache">true</property>
+		<!-- 开启二级缓存 -->
+		<property name="hibernate.cache.use_second_level_cache">true</property>
+
+		<!-- <property name="hibernate.cache.region.factory_class"> net.sf.ehcache.hibernate.EhCacheRegionFactory 
+			</property> <property name="hibernate.cache.region.factory_class"> net.sf.ehcache.hibernate.SingletonEhCacheRegionFactory 
+			</property> -->
+		<!-- 高速缓存提供程序 由于spring也使用了Ehcache, 保证双方都使用同一个缓存管理器 -->
+		<property name="hibernate.cache.region.factory_class">org.hibernate.cache.ehcache.SingletonEhCacheRegionFactory
+		</property>
+	</session-factory>
+</hibernate-configuration>

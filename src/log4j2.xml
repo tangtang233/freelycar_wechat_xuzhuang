@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/2002/xmlspec/dtd/2.10/xmlspec.dtd">
+<Configuration status="OFF">
+	<Appenders>
+		<!-- 控制台日志输入，INFO等级 -->
+		<Console name="console" target="SYSTEM_OUT">
+			<!-- <ThresholdFilter level="" /> -->
+			<PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss} [%p]%c{1} - %m%n" />
+		</Console>
+		<!-- 常规文件日志输出，debug等级 -->
+		<RollingFile name="date" fileName="C:/logs/freelycar_wechat.log"
+			filePattern="C:/logs/freelycar_wechat-%d{yyyy-MM-dd}.log">
+			<PatternLayout charset="UTF-8"
+				pattern="%d{yyyy-MM-dd HH:mm:ss} [%p]%c{1} - %m%n" />
+			<ThresholdFilter level="debug" />
+			<Append>true</Append>
+			<Policies>
+				<!-- <TimeBasedTriggeringPolicy interval="24"/> -->
+				<CronTriggeringPolicy schedule="* * 0 * * ?" />
+			</Policies>
+		</RollingFile>
+		<!-- org.apache.http连接日志输入，Warn等级 -->
+		<RollingFile name="http" fileName="C:/logs/freelycar_wechat-http.log"
+			filePattern="C:/logs/freelycar_wechat-http-%d{yyyy-MM-dd}.log">
+			<PatternLayout charset="UTF-8"
+				pattern="%d{yyyy-MM-dd HH:mm:ss} [%p]%c{1} - %m%n" />
+			<Append>true</Append>
+			<Policies>
+				<!-- <TimeBasedTriggeringPolicy interval="24"/> -->
+				<!-- <CronTriggeringPolicy schedule="* * 0 * * ?"/> -->
+				<SizeBasedTriggeringPolicy size="10 MB" />
+			</Policies>
+		</RollingFile>
+		<!-- org.hibernate连接日志输入，debug等级 -->
+		<RollingFile name="hibernate" fileName="C:/logs/freelycar_wechat-sql.log"
+			filePattern="C:/logs/freelycar_wechat-sql-%d{yyyy-MM-dd HH:mm}.log">
+			<PatternLayout charset="UTF-8"
+				pattern="%d{yyyy-MM-dd HH:mm:ss} [%p]%c{1} - %m%n" />
+			<Append>true</Append>
+			<Policies>
+				<!-- <TimeBasedTriggeringPolicy interval="24"/> -->
+				<!-- <CronTriggeringPolicy schedule="* * 0 * * ?"/> -->
+				<SizeBasedTriggeringPolicy size="30 MB" />
+			</Policies>
+		</RollingFile>
+		<!-- 异步文件输出 -->
+		<Async name="async">
+			<AppenderRef ref="date" />
+		</Async>
+		<Async name="async2">
+			<AppenderRef ref="http" />
+		</Async>
+		<Async name="async3">
+			<AppenderRef ref="hibernate" />
+		</Async>
+	</Appenders>
+	<Loggers>
+		<Logger name="com.geariot.platform" level="debug">
+			<AppenderRef ref="async" />
+		</Logger>
+		<Logger name="org.apache.http" level="Warn">
+			<AppenderRef ref="async2" />
+		</Logger>
+		<Logger name="org.hibernate" level="Warn">
+			<AppenderRef ref="async3" />
+		</Logger>
+		<Root level="info">
+			<AppenderRef ref="console" />
+		</Root>
+	</Loggers>
+</Configuration>
