@@ -191,7 +191,7 @@ public class WechatTemplateMessage {
         JSONObject data = new JSONObject();
         params.put("touser", openId);
         params.put("template_id", ORDER_CHANGED_ID);
-        params.put("url", "http://localhost:8000/index.html#/ordertrack?orderId=" + consumOrder.getId());
+        params.put("url", "http://" + WechatConfig.APP_DOMAIN + "/index.html#/ordertrack?orderId=" + consumOrder.getId());
         data.put("first", keywordFactory(first, "#173177"));
         data.put("OrderSn", keywordFactory(consumOrder.getId(), "#173177"));
         data.put("OrderStatus", keywordFactory(stateString, "#173177"));
