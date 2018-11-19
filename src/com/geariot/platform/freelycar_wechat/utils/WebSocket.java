@@ -73,17 +73,38 @@ public class WebSocket {
         error.printStackTrace();
     }
 
+    /**
+     * 向指定名称的客户端发送信息
+     * @param message
+     * @param to
+     * @throws IOException
+     */
     public void sendMessageTo(String message, String to) throws IOException {
         for (WebSocket item : clients.values()) {
             if (item.username.equals(to)) {
-                item.session.getAsyncRemote().sendText(message);
+                this.sendText(item.session,message);
             }
         }
     }
 
+    /**
+     * 向所有链接的客户端发送信息
+     * @param message
+     * @throws IOException
+     */
     public void sendMessageAll(String message) throws IOException {
         for (WebSocket item : clients.values()) {
-            item.session.getAsyncRemote().sendText(message);
+            this.sendText(item.session,message);
         }
+    }
+
+    /**
+     * 向对应用户发送消息（加方法锁，避免异常）
+     * 异常信息：java.lang.IllegalStateException: The remote endpoint was in state [TEXT_FULL_WRITING] which is an invalid state for called method
+     * @param webSocketSession
+     * @param message
+     */
+    public synchronized void sendText(Session webSocketSession, String message) {
+        webSocketSession.getAsyncRemote().sendText(message);
     }
 }
