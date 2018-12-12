@@ -8,6 +8,8 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 /**
@@ -19,6 +21,7 @@ public class CabinetService {
 
     /**
      * 显示某个网关下所有设备的状态
+     *
      * @param sn 网关编号
      * @return map(json)
      */
@@ -50,11 +53,12 @@ public class CabinetService {
 
     /**
      * 打开指定设备的门
+     *
      * @param deviceId 设备号
      * @return map(json)
      */
     public Map<String, Object> openDeviceById(String deviceId) {
-        String res = WSClient.controlDevices(deviceId,WSClient.DOOR_STATE_OPEN);
+        String res = WSClient.controlDevices(deviceId, WSClient.DOOR_STATE_OPEN);
         if (StringUtils.isEmpty(res)) {
             return RESCODE.UPDATE_ERROR.getJSONRES();
         }
@@ -64,15 +68,28 @@ public class CabinetService {
 
     /**
      * 关闭指定设备的门
+     *
      * @param deviceId 设备号
      * @return map(json)
      */
     public Map<String, Object> closeDeviceById(String deviceId) {
-        String res = WSClient.controlDevices(deviceId,WSClient.DOOR_STATE_CLOSE);
+        String res = WSClient.controlDevices(deviceId, WSClient.DOOR_STATE_CLOSE);
         if (StringUtils.isEmpty(res)) {
             return RESCODE.UPDATE_ERROR.getJSONRES();
         }
         JSONObject resJSONObject = JSONObject.parseObject(res);
         return resJSONObject.toJavaObject(Map.class);
+    }
+
+    public List<JSONObject> showGridsInfoBySnAndSpecification(String sn, Integer specification) {
+        List<JSONObject> resultList = new ArrayList<>();
+        for (int i = 0; i < specification; i++) {
+            int number = i + 1;
+            String deviceId = sn + "-" + number;
+            String resultJsonString = WSClient.getDeviceStateByID(deviceId);
+            JSONObject resultJson = JSONObject.parseObject(resultJsonString);
+            resultList.add(resultJson);
+        }
+        return resultList;
     }
 }

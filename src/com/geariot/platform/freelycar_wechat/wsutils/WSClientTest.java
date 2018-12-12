@@ -5,9 +5,9 @@ import org.apache.commons.lang.StringUtils;
 
 public class WSClientTest {
     public static void main(String[] args) {
-//        String deviceId = "867858031556536-7";
-//        System.out.println(WSClient.getDeviceStateByID(deviceId));
-//        System.out.println(WSClient.controlDevices(deviceId,"1"));
+        String deviceId = "869300034071526-10";
+        System.out.println(WSClient.getDeviceStateByID(deviceId));
+        System.out.println(WSClient.controlDevices(deviceId,"1"));
 //        System.out.println(WSClient.getDeviceStateByID("867858031556536"));
 //        System.out.println(WSClient.getDeviceStateByID("867858031556536-10"));
 //
@@ -16,7 +16,7 @@ public class WSClientTest {
 //        consumOrder.setState(1);
 //        WechatTemplateMessage.orderChanged(consumOrder,"ojtNs1vQCAHik8kc93vuoAKJlCzs");
 
-//        String sn = "867858031556536";
+//        String sn = "869300034071526";
 //        openAllDoors(sn);
     }
 
