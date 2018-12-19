@@ -10,6 +10,7 @@ import com.geariot.platform.freelycar_wechat.utils.DeviceStateThread;
 import com.geariot.platform.freelycar_wechat.utils.JsonResFactory;
 import com.geariot.platform.freelycar_wechat.wsutils.DeviceBean;
 import com.geariot.platform.freelycar_wechat.wsutils.DeviceValue;
+import com.geariot.platform.freelycar_wechat.wsutils.ResultBean;
 import com.geariot.platform.freelycar_wechat.wsutils.WSClient;
 import org.apache.commons.lang.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -18,10 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 /**
  * @author 唐炜
@@ -123,20 +121,25 @@ public class DeviceStateInfoService {
 
             List<DeviceStateInfo> onlineEmptyDevices = new ArrayList<>();
 
+            //获取远端设备状态
+            Map<String,DeviceBean> remoteDeviceBeans = this.formatRemoteDevicesInfosToMap(cabinetSN);
+            if (remoteDeviceBeans.isEmpty()) {
+                log.error("IMEI编号： "+ cabinetSN +" 的远端设备状态查询失败！返回null");
+                return null;
+            }
+
             log.debug("开始遍历所有可分配柜子的实际柜门开关状态：");
             //遍历出所有可分配柜子的实际柜门开关状态，如果为“开”则排除；如果是离线的柜子，也做一下排除；
             for (DeviceStateInfo emptyDeviceStateInfo : emptyDevicesList) {
                 //验证柜子是否离线
                 String emptyDeviceId = emptyDeviceStateInfo.getCabinetSN() + "-" + emptyDeviceStateInfo.getGridSN();
-                log.debug("调用远端接口查询柜门状态（开始）。柜门编号：", emptyDeviceId);
-                JSONObject resJSONObject = JSONObject.parseObject(WSClient.getDeviceStateByID(emptyDeviceId));
-                log.debug("调用远端接口查询柜门状态（结束）。开始分析逻辑。柜门编号：", emptyDeviceId);
-                if (WSClient.RESULT_SUCCESS.equalsIgnoreCase(resJSONObject.getString("res"))) {
-                    DeviceBean deviceBean = JSONObject.parseObject(resJSONObject.getJSONObject("value").toJSONString(), DeviceBean.class);
-                    if (null != deviceBean) {
+
+                log.debug("开始分析远端状态。柜门编号：", emptyDeviceId);
+                DeviceBean remoteDeviceInfo = remoteDeviceBeans.get(emptyDeviceId);
+                    if (null != remoteDeviceInfo) {
                         //如果柜子在线（online）且柜门是关闭的（0），则符合要求
-                        String heartBeat = deviceBean.getHeartbeat();
-                        String magne = deviceBean.getMagne();
+                        String heartBeat = remoteDeviceInfo.getHeartbeat();
+                        String magne = remoteDeviceInfo.getMagne();
                         if (DeviceValue.HEARTBEAT_ONLINE.getValue().equals(heartBeat) && DeviceValue.MAGNE_CLOSE.getValue().equals(magne)) {
                             log.info(emptyDeviceId + " 符合 随机分配要求。");
                             onlineEmptyDevices.add(emptyDeviceStateInfo);
@@ -153,8 +156,7 @@ public class DeviceStateInfoService {
                             }
                         }
                     }
-                }
-                log.debug("分析逻辑结束。柜门编号：", emptyDeviceId);
+                log.debug("分析结束。柜门编号：", emptyDeviceId);
             }
 
             int emptyDevicesCount = onlineEmptyDevices.size();
@@ -388,5 +390,34 @@ public class DeviceStateInfoService {
             return null;
         }
         return deviceStateInfoDao.findByOrderId(orderId);
+    }
+
+
+    /**
+     * 格式化远端设备状态，转化成
+     * @param gwNum IMEI编号（sn）
+     * @return map
+     */
+    Map<String, DeviceBean> formatRemoteDevicesInfosToMap(String gwNum) {
+        Map<String, DeviceBean> remoteDevicesInfo = new HashMap<>();
+
+        //查询远端该设备编号下所有线路状态
+        String remoteAllDevicesStateResult = WSClient.getAllDeviceStateByGWNum(gwNum);
+        ResultBean resultBean = JSONObject.parseObject(remoteAllDevicesStateResult, ResultBean.class);
+        if (null != resultBean) {
+            String res = resultBean.getRes();
+            if (WSClient.RESULT_SUCCESS.equalsIgnoreCase(res)) {
+                String value = resultBean.getValue();
+                List<DeviceBean> remoteDeviceBeans = JSONObject.parseArray(value, DeviceBean.class);
+                if (null != remoteDeviceBeans && !remoteDeviceBeans.isEmpty()) {
+                    for (DeviceBean remoteDeviceBean : remoteDeviceBeans) {
+                        if (null != remoteDeviceBean && StringUtils.isNotEmpty(remoteDeviceBean.getId())) {
+                            remoteDevicesInfo.put(remoteDeviceBean.getId(), remoteDeviceBean);
+                        }
+                    }
+                }
+            }
+        }
+        return remoteDevicesInfo;
     }
 }

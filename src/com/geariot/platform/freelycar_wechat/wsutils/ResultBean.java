@@ -24,8 +24,15 @@ public class ResultBean {
 	public void setValue(String value) {
 		this.value = value;
 	}
+
 	@Override
 	public String toString() {
-		return "ResultBean [res=" + res + ", value=" + value + "]";
+		final StringBuilder sb = new StringBuilder("{");
+		sb.append("\"res\":\"")
+				.append(res).append('\"');
+		sb.append(",\"value\":\"")
+				.append(value).append('\"');
+		sb.append('}');
+		return sb.toString();
 	}
 }

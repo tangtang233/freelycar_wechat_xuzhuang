@@ -1,7 +1,12 @@
 package com.geariot.platform.freelycar_wechat.wsutils;
 
 
+import com.alibaba.fastjson.JSONObject;
 import org.apache.commons.lang.StringUtils;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class WSClientTest {
     public static void main(String[] args) {
@@ -17,7 +22,6 @@ public class WSClientTest {
 //        WechatTemplateMessage.orderChanged(consumOrder,"ojtNs1vQCAHik8kc93vuoAKJlCzs");
 
         String sn = "869300034071526";
-        System.out.println(WSClient.getAllDeviceStateByGWNum(sn));
 //        openAllDoors(sn);
     }
 
