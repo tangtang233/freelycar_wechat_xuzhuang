@@ -8,19 +8,16 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class WSClient {
+    public static final String RESULT_SUCCESS = "suc";
+    public static final String RESULT_ERROR = "err";
+    public static final String DOOR_STATE_CLOSE = "0";
+    public static final String DOOR_STATE_OPEN = "1";
     private static final Logger log = LogManager.getLogger(WSClient.class);
     private static final String USER_NAME = "admin";
     private static final String USER_PASSWORD = "admin";
     private static String handle = null;
     private static String outdate = "0";
     private static Client client;
-
-    public static final String RESULT_SUCCESS = "suc";
-    public static final String RESULT_ERROR = "err";
-
-    public static final String DOOR_STATE_CLOSE = "0";
-    public static final String DOOR_STATE_OPEN = "1";
-
 
     static {
         JaxWsDynamicClientFactory dcf = JaxWsDynamicClientFactory.newInstance();
@@ -94,10 +91,11 @@ public class WSClient {
     }
 
     /**
-     * 查询某个指定设备当前状态信息
+     * 查询所有设备当前状态信息
      *
      * @return string
      */
+    @Deprecated
     public static String getAllDevicesState() {
         handle = getHandle();
 
@@ -114,6 +112,34 @@ public class WSClient {
         }
         return (String) res[0];
     }
+
+    /**
+     * 根据IMEI号查询设备下所以柜门的状态
+     *
+     * @param gwNum 设备IMEI号
+     * @return
+     */
+    public static String getAllDeviceStateByGWNum(String gwNum) {
+        if (StringUtils.isEmpty(gwNum)) {
+            log.error("参数gwNum为空！");
+            return "";
+        }
+        handle = getHandle();
+
+        Object[] t = {handle, gwNum};
+        Object[] res = null;
+        try {
+            res = client.invoke("getAllDeviceStateByGWNum", t);
+        } catch (Exception e) {
+            log.error("调用方法getAllDeviceStateByGWNum(查询当前智能柜所有柜门状态信息)失败！", e);
+            e.printStackTrace();
+        }
+        if (null == res) {
+            return null;
+        }
+        return (String) res[0];
+    }
+
 
     /**
      * 查询某个指定设备当前状态信息
@@ -284,6 +310,7 @@ public class WSClient {
 
     /**
      * 为某个指定设备添加指定卡号
+     *
      * @param deviceID 设备编号
      * @param cardNum  要设置的卡号
      * @return string
@@ -312,9 +339,10 @@ public class WSClient {
 
     /**
      * 删除某个设备的指定卡号
-     * @param deviceID  设备编号
-     * @param cardNum   要删除的卡号
-     * @return  string
+     *
+     * @param deviceID 设备编号
+     * @param cardNum  要删除的卡号
+     * @return string
      */
     public static String deleteCardByID(String deviceID, String cardNum) {
         if (StringUtils.isEmpty(deviceID)) {
@@ -341,8 +369,9 @@ public class WSClient {
     /**
      * 对某个指定设备进行补货
      * 确保传入的deviceID有效，若调用接口时，goods本来就为1，接口也将返回success
-     * @param deviceID  设备编号，如：801001-1
-     * @return  string
+     *
+     * @param deviceID 设备编号，如：801001-1
+     * @return string
      */
     public static String replenishByDeviceID(String deviceID) {
         if (StringUtils.isEmpty(deviceID)) {
@@ -365,8 +394,9 @@ public class WSClient {
     /**
      * 对某个指定网关下所有设备节点进行补货
      * 确保传入的gwNum有效，若调用接口时，goods本来就为1，接口也将返回success
+     *
      * @param gwNum 网关号，如：801001
-     * @return  string
+     * @return string
      */
     public static String oneKeyReplenish(String gwNum) {
         if (StringUtils.isEmpty(gwNum)) {
@@ -388,7 +418,8 @@ public class WSClient {
 
     /**
      * 注销用户的句柄
-     * @return  string
+     *
+     * @return string
      */
     public static String logout() {
         if (StringUtils.isEmpty(handle)) {

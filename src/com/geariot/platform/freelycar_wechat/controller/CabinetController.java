@@ -35,6 +35,17 @@ public class CabinetController {
     }
 
     /**
+     * 根据IMEI编号查询智能柜所有柜门的状态
+     * @param gwNum IMEI编号
+     * @return json
+     */
+    @GetMapping
+    @RequestMapping(value = "/getAllDeviceStateByGWNum")
+    public JSONObject getAllDeviceStateByGWNum(@RequestParam(name = "gwNum") String gwNum) {
+        return cabinetService.getAllDeviceStateByGWNum(gwNum);
+    }
+
+    /**
      * 显示某个柜门的状态
      * @param deviceId
      * @return

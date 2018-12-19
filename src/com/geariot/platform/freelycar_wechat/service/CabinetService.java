@@ -25,6 +25,7 @@ public class CabinetService {
      * @param sn 网关编号
      * @return map(json)
      */
+    @Deprecated
     public Map<String, Object> showGridsInfo(String sn) {
         if (StringUtils.isEmpty(sn)) {
             return RESCODE.WRONG_PARAM.getJSONRES();
@@ -81,6 +82,12 @@ public class CabinetService {
         return resJSONObject.toJavaObject(Map.class);
     }
 
+    /**
+     * 根据智能柜编号和规格数查询所有状态
+     * @param sn 智能柜编号
+     * @param specification 规格数
+     * @return
+     */
     public List<JSONObject> showGridsInfoBySnAndSpecification(String sn, Integer specification) {
         List<JSONObject> resultList = new ArrayList<>();
         for (int i = 0; i < specification; i++) {
@@ -91,5 +98,15 @@ public class CabinetService {
             resultList.add(resultJson);
         }
         return resultList;
+    }
+
+    /**
+     * 根据IMEI编号查询智能柜所有柜门的状态
+     * @param gwNum IMEI编号
+     * @return json
+     */
+    public JSONObject getAllDeviceStateByGWNum(String gwNum) {
+        String result = WSClient.getAllDeviceStateByGWNum(gwNum);
+        return JSONObject.parseObject(result);
     }
 }
