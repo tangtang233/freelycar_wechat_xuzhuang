@@ -96,6 +96,7 @@ public class ConsumOrderController {
             @RequestParam(value = "cabinetSN", required = false) String cabinetSN,
             @RequestParam(value = "parkingLocation", required = false) String parkingLocation
     ) {
+        log.info("调用了serviceFinish（技师去存钥匙）接口！");
         return consumOrderService.serviceFinish(orderId, cabinetSN, parkingLocation);
     }
 

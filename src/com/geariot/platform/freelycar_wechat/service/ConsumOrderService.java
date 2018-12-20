@@ -391,9 +391,11 @@ public class ConsumOrderService {
             log.error("技师取钥匙时，开柜失败。原因：数据consumOrder对象没有找到。");
             return RESCODE.NOT_FOUND.getJSONRES();
         }
+        log.info("接口接收数据验证结束，开始随机分配智能柜！");
         //打开柜子，并等待柜门关上再操作数据
         com.alibaba.fastjson.JSONObject doorResult = deviceStateInfoService.openRandomDeviceDoor(cabinetSN);
         String deviceId = doorResult.getString("deviceId");
+        log.info("接口执行智能柜分配操作结束，" + deviceId + "柜门应该已经打开并关上！");
         if (null == deviceId) {
             return RESCODE.NOT_HAVE_EMPTY_GRID.getJSONRES(doorResult.getString("msg"));
         }
