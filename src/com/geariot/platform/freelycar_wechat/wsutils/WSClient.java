@@ -157,7 +157,8 @@ public class WSClient {
         Object[] t = {handle, deviceID};
         Object[] res = null;
         try {
-            res = client.invoke("getDeviceStateByID", t);
+            // 原：getDeviceStateByID 现：getSingleDeviceStateByID
+            res = client.invoke("getSingleDeviceStateByID", t);
         } catch (Exception e) {
             log.error("调用方法getDeviceStateByID(查询某个指定设备当前状态信息)失败！", e);
             e.printStackTrace();
